@@ -1,0 +1,34 @@
+# Python and environments
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Datasets and large model files
+data/
+dataset/
+training_runs/
+*.pt
+*.onnx
+*.weights
+uploads/
+
+# Node
+node_modules/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Flask/Other
+*.log

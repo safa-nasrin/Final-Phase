@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Scan - Live Scanner</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #64B5F6;
+            --dark-blue: #1565C0;
+            --light-bg: #F5F5F5;
+            --text-main: #333333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, var(--dark-blue), var(--primary-blue));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0 0 0 16px;
+            font-size: 24px;
+        }
+
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .preview-box {
+            width: 300px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00E5FF;
+            /* Cyan accent matching previous flutter mockup */
+        }
+
+        .result-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(21, 101, 192, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .result-group {
+            font-size: 64px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .bottom-actions {
+            padding: 32px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .scan-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: white;
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scan-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 229, 255, 0.3);
+            border-top: 4px solid #00E5FF;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="material-icons-outlined" onclick="window.location.href='/'"
+                style="cursor:pointer;">arrow_back</span>
+            <h1>Live Scan</h1>
+        </div>
+
+        <div class="workspace">
+            <div class="preview-box" id="previewBox">
+                <span class="material-icons-outlined" id="placeholderIcon"
+                    style="font-size: 80px; opacity: 0.5; margin-bottom: 16px;">fingerprint</span>
+                <span id="placeholderText">Select an image to analyze</span>
+
+                <img id="imagePreview" class="preview-img" />
+
+                <div class="overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
+                    <h2 style="margin:0;">Verifying...</h2>
+                </div>
+
+                <div class="result-overlay" id="resultOverlay">
+                    <span class="material-icons-outlined" style="color: #69F0AE; font-size: 64px;">check_circle</span>
+                    <div style="margin-top: 16px; font-size: 18px;">Detected Blood Group:</div>
+                    <div class="result-group" id="bloodGroupText">A+</div>
+                    <div id="confidenceText" style="color: rgba(255,255,255,0.7); font-size: 14px;">99% confidence</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-actions">
+            <!-- Hidden file input triggered by button -->
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+            <button class="scan-btn" onclick="document.getElementById('fileInput').click()">
+                <span class="material-icons-outlined">document_scanner</span>
+                Scan Fingerprint
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show local preview
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('placeholderIcon').style.display = 'none';
+                document.getElementById('placeholderText').style.display = 'none';
+                document.getElementById('resultOverlay').style.display = 'none';
+
+                const img = document.getElementById('imagePreview');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                img.style.border = 'none';
+
+                // Trigger AI Prediction Flow
+                processImage(file);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function processImage(file) {
+            // Show loading overlay over the image
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (data.success) {
+                    // Populate result
+                    document.getElementById('bloodGroupText').innerText = data.blood_group;
+                    document.getElementById('confidenceText').innerText = data.confidence + ' confidence';
+
+                    // Show Result Overlay
+                    document.getElementById('resultOverlay').style.display = 'flex';
+                } else {
+                    alert('Prediction Failed: ' + data.error);
+                }
+            } catch (err) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert('Server Error: Could not reach backend.');
+            }
+        }
+    </script>
+</body>
+
+</html>
