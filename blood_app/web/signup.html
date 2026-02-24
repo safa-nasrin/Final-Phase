@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Scan - Sign Up</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #64B5F6;
+            --dark-blue: #1565C0;
+            --light-bg: #F5F5F5;
+            --text-main: #333333;
+            --text-muted: #757575;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 480px;
+            /* LayoutBuilder equivalent: Mobile width constraint */
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header .material-icons-outlined {
+            font-size: 60px;
+            color: var(--primary-blue);
+        }
+
+        h1 {
+            color: var(--dark-blue);
+            font-size: 28px;
+            font-weight: 700;
+            margin: 8px 0 4px 0;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0 0 24px 0;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .input-group .material-icons-outlined {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background-color: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            appearance: none;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .row .input-group {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(100, 181, 246, 0.2);
+            transition: background-color 0.2s;
+            margin-top: 8px;
+            margin-bottom: 24px;
+        }
+
+        button:hover {
+            background-color: #42A5F5;
+        }
+
+        .login-row {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .login-row a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="material-icons-outlined">person_add</span>
+            <h1>Create Account</h1>
+            <p class="subtitle">Join to start your medical profile</p>
+        </div>
+
+        <form id="signupForm" onsubmit="handleSignup(event)">
+            <div class="input-group">
+                <span class="material-icons-outlined">badge</span>
+                <input type="text" id="fullName" placeholder="Full Name" required>
+            </div>
+
+            <div class="input-group">
+                <span class="material-icons-outlined">email</span>
+                <input type="email" id="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="input-group">
+                <span class="material-icons-outlined">lock</span>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+
+            <div class="row">
+                <div class="input-group">
+                    <span class="material-icons-outlined">cake</span>
+                    <input type="number" id="age" placeholder="Age" min="1" max="150" required>
+                </div>
+                <div class="input-group">
+                    <span class="material-icons-outlined">wc</span>
+                    <select id="gender" required>
+                        <option value="" disabled selected>Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <span class="material-icons-outlined">location_city</span>
+                <input type="text" id="city" placeholder="City" required>
+            </div>
+
+            <button type="submit">Complete Sign Up</button>
+        </form>
+
+        <div class="login-row">
+            Already have an account? <a href="/">Log In</a>
+        </div>
+    </div>
+
+    <script>
+        async function handleSignup(event) {
+            event.preventDefault();
+
+            // Detect interface type
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const deviceType = isMobile ? 'Mobile' : 'Laptop/Desktop';
+
+            // Gather form values
+            const payload = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                city: document.getElementById('city').value,
+                deviceType: deviceType
+            };
+
+            try {
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Signup successful! Registered via: ' + deviceType);
+                    window.location.href = '/scan';
+                } else {
+                    alert('Signup failed: ' + data.error);
+                }
+            } catch (err) {
+                alert('Server Error: Could not reach backend.');
+            }
+        }
+    </script>
+</body>
+
+</html>

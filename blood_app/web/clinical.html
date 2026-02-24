@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Blood Scan - Live Scanner</title>
-    <!-- Inter Font -->
+    <title>Blood Scan - Clinical Lab Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <style>
         :root {
@@ -21,7 +19,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(to bottom, var(--dark-blue), var(--primary-blue));
+            background: linear-gradient(to bottom, #111827, #1F2937);
+            /* Dark UI for Lab Mode */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,18 +33,21 @@
             max-width: 480px;
             display: flex;
             flex-direction: column;
+            background-color: var(--light-bg);
         }
 
         .header {
             padding: 24px;
+            background-color: #111827;
             color: white;
             display: flex;
             align-items: center;
+            border-bottom: 2px solid #374151;
         }
 
         .header h1 {
             margin: 0 0 0 16px;
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .workspace {
@@ -55,29 +57,32 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            background-color: #F9FAFB;
         }
 
         .preview-box {
-            width: 300px;
-            height: 400px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            width: 320px;
+            height: 240px;
+            /* Wider for 4 slides */
+            background: white;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            border: 2px dashed rgba(255, 255, 255, 0.5);
+            color: #6B7280;
+            border: 2px dashed #9CA3AF;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         }
 
         .preview-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: none;
+            background-color: black;
         }
 
         .overlay {
@@ -86,13 +91,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(17, 24, 39, 0.8);
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #00E5FF;
-            /* Cyan accent matching previous flutter mockup */
+            color: #10B981;
+            /* Green accent */
         }
 
         .result-overlay {
@@ -101,7 +106,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(21, 101, 192, 0.9);
+            background: rgba(17, 24, 39, 0.95);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -121,37 +126,41 @@
         }
 
         .result-group {
-            font-size: 64px;
+            font-size: 32px;
             font-weight: 700;
             margin: 8px 0;
+            text-align: center;
         }
 
         .bottom-actions {
-            padding: 32px;
+            padding: 24px;
             width: 100%;
             box-sizing: border-box;
+            background: white;
+            border-top: 1px solid #E5E7EB;
         }
 
         .scan-btn {
             width: 100%;
             padding: 16px;
-            background-color: white;
-            color: var(--dark-blue);
+            background-color: var(--dark-blue);
+            color: white;
             border: none;
-            border-radius: 30px;
-            font-size: 20px;
+            border-radius: 12px;
+            font-size: 18px;
             font-weight: 700;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 12px;
+            transition: background-color 0.2s;
         }
 
         .scan-btn:hover {
-            background-color: #f0f0f0;
+            background-color: #1E3A8A;
         }
 
         input[type="file"] {
@@ -159,13 +168,13 @@
         }
 
         .spinner {
-            border: 4px solid rgba(0, 229, 255, 0.3);
-            border-top: 4px solid #00E5FF;
+            border: 4px solid rgba(16, 185, 129, 0.3);
+            border-top: 4px solid #10B981;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         @keyframes spin {
@@ -185,50 +194,53 @@
         <div class="header">
             <span class="material-icons-outlined" onclick="window.location.href='/home'"
                 style="cursor:pointer;">arrow_back</span>
-            <h1>Live Scan</h1>
+            <h1>Clinical Lab Mode</h1>
         </div>
 
         <div class="workspace">
+            <h3 style="color: #374151; margin-bottom: 24px;">Upload 4-Sample Slide</h3>
             <div class="preview-box" id="previewBox">
                 <span class="material-icons-outlined" id="placeholderIcon"
-                    style="font-size: 80px; opacity: 0.5; margin-bottom: 16px;">fingerprint</span>
-                <span id="placeholderText">Select an image to analyze</span>
+                    style="font-size: 64px; opacity: 0.5; margin-bottom: 16px;">biotech</span>
+                <span id="placeholderText">Tap below to scan slide</span>
 
                 <img id="imagePreview" class="preview-img" />
 
                 <div class="overlay" id="loadingOverlay">
                     <div class="spinner"></div>
-                    <h2 style="margin:0;">Verifying...</h2>
+                    <h3 style="margin:0;">Analyzing Texture...</h3>
                 </div>
 
                 <div class="result-overlay" id="resultOverlay">
                     <span class="material-icons-outlined" id="resultIcon"
-                        style="color: #69F0AE; font-size: 64px;">check_circle</span>
-                    <div id="resultLabel"
-                        style="margin-top: 16px; font-size: 18px; text-align: center; padding: 0 16px;">Detected Blood
-                        Group:</div>
-                    <div class="result-group" id="bloodGroupText" style="text-align: center; padding: 0 16px;">A+</div>
-                    <div id="confidenceText" style="color: rgba(255,255,255,0.7); font-size: 14px;">99% confidence</div>
+                        style="color: #10B981; font-size: 48px;">science</span>
+                    <div id="resultLabel" style="margin-top: 16px; font-size: 16px;">Blood Group Output:</div>
+                    <div class="result-group" id="bloodGroupText">O+</div>
+                    <button onclick="viewProcessedImage()"
+                        style="margin-top: 16px; background: transparent; border: 1px solid #10B981; color: #10B981; padding: 8px 16px; border-radius: 8px; cursor: pointer;">View
+                        Overlay</button>
                 </div>
             </div>
+            <p style="text-align: center; color: #6B7280; font-size: 13px; padding: 0 32px; margin-top: 24px;">Ensure
+                the slide has 4 distinct circles aligned horizontally (A, B, D, Control) in clear lighting.</p>
         </div>
 
         <div class="bottom-actions">
-            <!-- Hidden file input triggered by button -->
             <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
             <button class="scan-btn" onclick="document.getElementById('fileInput').click()">
-                <span class="material-icons-outlined">document_scanner</span>
-                Scan Fingerprint
+                <span class="material-icons-outlined">camera_alt</span>
+                Capture Slide
             </button>
         </div>
     </div>
 
     <script>
+        let processedImageBase64 = null;
+
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Show local preview
             const reader = new FileReader();
             reader.onload = function (e) {
                 document.getElementById('placeholderIcon').style.display = 'none';
@@ -238,56 +250,55 @@
                 const img = document.getElementById('imagePreview');
                 img.src = e.target.result;
                 img.style.display = 'block';
-                img.style.border = 'none';
 
-                // Trigger AI Prediction Flow
-                processImage(file);
+                processClinicalImage(file);
             }
             reader.readAsDataURL(file);
         }
 
-        async function processImage(file) {
-            // Show loading overlay over the image
+        async function processClinicalImage(file) {
             document.getElementById('loadingOverlay').style.display = 'flex';
 
             const formData = new FormData();
             formData.append('image', file);
 
             try {
-                const response = await fetch('/api/predict', {
+                const response = await fetch('/api/clinical_predict', {
                     method: 'POST',
                     body: formData
                 });
 
                 const data = await response.json();
-
-                // Hide loading overlay
                 document.getElementById('loadingOverlay').style.display = 'none';
 
                 if (data.success) {
-                    // Populate Success result
-                    document.getElementById('resultIcon').style.color = '#69F0AE';
-                    document.getElementById('resultIcon').innerText = 'check_circle';
-                    document.getElementById('resultLabel').innerText = 'Detected Blood Group:';
-                    document.getElementById('bloodGroupText').style.fontSize = '64px';
+                    document.getElementById('resultIcon').style.color = '#10B981';
+                    document.getElementById('resultIcon').innerText = 'science';
+                    document.getElementById('resultLabel').innerText = 'Clinical Result:';
                     document.getElementById('bloodGroupText').innerText = data.blood_group;
-                    document.getElementById('confidenceText').innerText = data.confidence + ' confidence';
-                    document.getElementById('resultOverlay').style.background = 'rgba(21, 101, 192, 0.9)';
+                    processedImageBase64 = data.processed_image;
+                    document.getElementById('resultOverlay').style.background = 'rgba(17, 24, 39, 0.95)';
                     document.getElementById('resultOverlay').style.display = 'flex';
                 } else {
-                    // Populate Error / OpenCV Failure result
-                    document.getElementById('resultIcon').style.color = '#FF5252'; // Red
+                    document.getElementById('resultIcon').style.color = '#EF4444';
                     document.getElementById('resultIcon').innerText = 'error_outline';
-                    document.getElementById('resultLabel').innerText = 'Quality Check Failed:';
-                    document.getElementById('bloodGroupText').style.fontSize = '24px';
+                    document.getElementById('resultLabel').innerText = 'Lab Analysis Failed:';
+                    document.getElementById('bloodGroupText').style.fontSize = '20px';
                     document.getElementById('bloodGroupText').innerText = data.error;
-                    document.getElementById('confidenceText').innerText = 'Please try again.';
-                    document.getElementById('resultOverlay').style.background = 'rgba(198, 40, 40, 0.9)';
+                    processedImageBase64 = data.processed_image || null;
+                    document.getElementById('resultOverlay').style.background = 'rgba(127, 29, 29, 0.95)';
                     document.getElementById('resultOverlay').style.display = 'flex';
                 }
             } catch (err) {
                 document.getElementById('loadingOverlay').style.display = 'none';
                 alert('Server Error: Could not reach backend.');
+            }
+        }
+
+        function viewProcessedImage() {
+            if (processedImageBase64) {
+                document.getElementById('resultOverlay').style.display = 'none';
+                document.getElementById('imagePreview').src = 'data:image/jpeg;base64,' + processedImageBase64;
             }
         }
     </script>

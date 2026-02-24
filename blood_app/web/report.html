@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Scan - AI Report Summarizer</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #64B5F6;
+            --dark-blue: #1565C0;
+            --light-bg: #F5F5F5;
+            --text-main: #333333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, var(--dark-blue), var(--primary-blue));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
+
+        .header {
+            padding: 24px;
+            background-color: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0 0 0 16px;
+            font-size: 24px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .upload-card {
+            background-color: var(--light-bg);
+            border: 2px dashed var(--primary-blue);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .upload-card:hover {
+            background-color: #E3F2FD;
+        }
+
+        .upload-card .material-icons-outlined {
+            font-size: 48px;
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+        }
+
+        .upload-card h3 {
+            margin: 0 0 8px 0;
+            color: var(--dark-blue);
+            font-size: 18px;
+        }
+
+        .upload-card p {
+            margin: 0;
+            color: #757575;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(100, 181, 246, 0.2);
+            transition: background-color 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .upload-btn:hover {
+            background-color: #42A5F5;
+        }
+
+        .upload-btn:disabled {
+            background-color: #BDBDBD;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .summary-box {
+            background-color: #F3F4F6;
+            border-radius: 12px;
+            padding: 16px;
+            display: none;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .summary-box h3 {
+            margin: 0 0 12px 0;
+            color: var(--dark-blue);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-content {
+            font-size: 14px;
+            color: #4B5563;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            /* to handle \n properly */
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="material-icons-outlined" onclick="window.location.href='/home'"
+                style="cursor:pointer;">arrow_back</span>
+            <h1>Report Summarizer</h1>
+        </div>
+
+        <div class="content">
+            <p style="color: #666; margin-bottom: 24px; text-align: center;">Upload your medical PDF reports and let our
+                AI extract and summarize the key insights.</p>
+
+            <div class="upload-card" onclick="document.getElementById('pdfInput').click()" id="dropZone">
+                <span class="material-icons-outlined">picture_as_pdf</span>
+                <h3>Select PDF Report</h3>
+                <p id="fileNameDisplay">Tap to browse files</p>
+            </div>
+
+            <input type="file" id="pdfInput" accept="application/pdf" onchange="handleFileSelect(event)">
+
+            <button class="upload-btn" id="summarizeBtn" onclick="summarizeReport()" disabled>
+                <div class="spinner" id="btnSpinner"></div>
+                <span id="btnText">Generate Summary</span>
+            </button>
+
+            <div class="summary-box" id="summaryBox">
+                <h3><span class="material-icons-outlined" style="font-size: 20px;">auto_awesome</span> AI Insights</h3>
+                <div class="summary-content" id="summaryContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.type !== "application/pdf") {
+                alert("Please select a valid PDF file.");
+                return;
+            }
+
+            selectedFile = file;
+            document.getElementById('fileNameDisplay').innerText = file.name;
+            document.getElementById('fileNameDisplay').style.color = "var(--dark-blue)";
+            document.getElementById('fileNameDisplay').style.fontWeight = "600";
+
+            // Enable button
+            document.getElementById('summarizeBtn').disabled = false;
+
+            // Hide previous results
+            document.getElementById('summaryBox').style.display = 'none';
+        }
+
+        async function summarizeReport() {
+            if (!selectedFile) return;
+
+            // UI Loading State
+            const btn = document.getElementById('summarizeBtn');
+            const spinner = document.getElementById('btnSpinner');
+            const btnText = document.getElementById('btnText');
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.innerText = 'Analyzing PDF...';
+
+            const formData = new FormData();
+            formData.append('pdf', selectedFile);
+
+            try {
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('summaryContent').innerText = data.summary;
+                    document.getElementById('summaryBox').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Server Error: Could not reach backend.');
+            } finally {
+                // Restore button state
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.innerText = 'Generate Summary';
+            }
+        }
+    </script>
+</body>
+
+</html>

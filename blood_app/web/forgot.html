@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blood Scan - Forgot Password</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #64B5F6;
+            --dark-blue: #1565C0;
+            --light-bg: #F5F5F5;
+            --text-main: #333333;
+            --text-muted: #757575;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            max-width: 480px;
+            /* Mobile width constraint */
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .icon-container {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .icon-container .material-icons-outlined {
+            font-size: 80px;
+            color: var(--primary-blue);
+        }
+
+        h1 {
+            color: var(--dark-blue);
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 8px 0;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 15px;
+            margin: 0 0 32px 0;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .input-group .material-icons-outlined {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background-color: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary-blue);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(100, 181, 246, 0.2);
+            transition: background-color 0.2s;
+            margin-bottom: 24px;
+        }
+
+        button:hover {
+            background-color: #42A5F5;
+        }
+
+        .back-row {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .back-row a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon-container">
+            <span class="material-icons-outlined">lock_reset</span>
+        </div>
+
+        <h1>Reset Password</h1>
+        <p class="subtitle">Enter your email address and we'll send you instructions to reset your password.</p>
+
+        <form onsubmit="handleReset(event)">
+            <div class="input-group">
+                <span class="material-icons-outlined">email</span>
+                <input type="email" id="resetEmail" placeholder="Email Address" required>
+            </div>
+
+            <button type="submit">Send Reset Link</button>
+        </form>
+
+        <div class="back-row">
+            <a href="/"><span class="material-icons-outlined" style="font-size: 18px;">arrow_back</span> Back to
+                Login</a>
+        </div>
+    </div>
+
+    <script>
+        function handleReset(event) {
+            event.preventDefault();
+            const email = document.getElementById('resetEmail').value;
+            // Mock forgot password action
+            alert(`Password reset instructions sent to ${email} (Mock Action)`);
+            window.location.href = '/';
+        }
+    </script>
+</body>
+
+</html>
