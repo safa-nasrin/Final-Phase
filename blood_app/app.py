@@ -237,26 +237,26 @@ def clinical_predict():
     output_img = img.copy()
     
     for i, (x, y, r) in enumerate(circles):
-        # Create mask for the circle
-        mask = np.zeros_like(gray)
-        cv2.circle(mask, (x, y), r, 255, -1)
-        
-        # Extract circle region
-        roi = cv2.bitwise_and(gray, gray, mask=mask)
-        
-        # Crop to bounding box for faster processing
+        # Crop bounding box first
         x1, y1 = max(0, x - r), max(0, y - r)
         x2, y2 = min(gray.shape[1], x + r), min(gray.shape[0], y + r)
-        roi_cropped = roi[y1:y2, x1:x2]
         
-        # Canny edge detection to find texture / agglutination
-        edges = cv2.Canny(roi_cropped, 50, 150)
+        roi_cropped_gray = gray[y1:y2, x1:x2]
+        
+        # Create mask for the circle inside the cropped region (slightly shrunk to avoid physical borders)
+        mask_cropped = np.zeros_like(roi_cropped_gray)
+        cv2.circle(mask_cropped, (x - x1, y - y1), max(1, r - 2), 255, -1)
+        
+        # Canny edge detection on raw grayscale to avoid circle mask border artifacts
+        edges = cv2.Canny(roi_cropped_gray, 50, 150)
+        
+        # Only keep edges inside our valid inner mask
+        masked_edges = cv2.bitwise_and(edges, edges, mask=mask_cropped)
         
         # Calculate edge density (valid area inside circle)
-        mask_cropped = mask[y1:y2, x1:x2]
         valid_pixels = cv2.countNonZero(mask_cropped)
         if valid_pixels == 0: valid_pixels = 1
-        edge_pixels = cv2.countNonZero(edges)
+        edge_pixels = cv2.countNonZero(masked_edges)
         
         density = (edge_pixels / valid_pixels) * 100
         
